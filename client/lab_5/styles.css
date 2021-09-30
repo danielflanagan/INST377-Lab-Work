@@ -29,6 +29,7 @@ body {
 .box {
   background-color: white;
   padding: 2rem;
+  margin: 10px;
 }
 
 .columns {

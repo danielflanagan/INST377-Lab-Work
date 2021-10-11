@@ -1,22 +1,21 @@
-const endpoint = 'https://data.princegeorgescountymd.gov/resource/umjn-t2iz.json';
+async function windowFunctions() {
+  const endpoint = 'https://data.princegeorgescountymd.gov/resource/umjn-t2iz.json';
 
-const cities = [];
+  const request = await fetch(endpoint);
 
-fetch(endpoint)
-  .then((blob) => blob.json())
-  .then((data) => cities.push(...data));
+  const cities = await request.json();
 
-function findMatches(wordToMatch, cities) {
-  return cities.filter((place) => {
+  function findMatches(wordToMatch, cities) {
+    return cities.filter((place) => {
     // here we need to figure out if category or zip matches what was searched
-    const regex = new RegExp(wordToMatch, 'gi');
-    return place.category.match(regex) || place.name.match(regex);
-  });
-}
+      const regex = new RegExp(wordToMatch, 'gi');
+      return place.category.match(regex) || place.name.match(regex);
+    });
+  }
 
-function displayMatches() {
-  const matchArray = findMatches(this.value, cities);
-  const html = matchArray.map((place) => `
+  function displayMatches(event) {
+    const matchArray = findMatches(event.target.value, cities);
+    const html = matchArray.map((place) => `
         <ul>
             <li><div class="name">${place.name}</div></li>
             <div class="category">${place.category}</div>
@@ -26,10 +25,16 @@ function displayMatches() {
         </ul>
         <br>
       `).join('');
-  suggestions.innerHTML = html;
+    suggestions.innerHTML = html;
+    if (!event.target.value) {
+      document.querySelector('.suggestions').innerHTML = '';
+      return false;
+    }
+  }
+
+  const searchInput = document.querySelector('.search');
+  const suggestions = document.querySelector('.suggestions');
+
+  searchInput.addEventListener('keyup', (evt) => { displayMatches(evt); });
 }
-
-const searchInput = document.querySelector('.search');
-const suggestions = document.querySelector('.suggestions');
-
-searchInput.addEventListener('keyup', displayMatches);
+window.onload = windowFunctions;
